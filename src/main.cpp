@@ -13,7 +13,7 @@ float e_est = 10;
 float q = 0.2;
 
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
-SimpleKalmanFilter kf = SimpleKalmanFilter(e_mea, e_est, q);
+SimpleKalmanFilter kf;
 
 int pointer = 0;
 float dataPoint[MAX_DATA_POINT] = {};
@@ -29,6 +29,9 @@ void setup() {
   Wire.begin();  // Joing I2C bus
   mlx.begin();
   M5.Lcd.fillScreen(BLACK);
+
+  q = EEPROM.readFloat(0);
+  kf = SimpleKalmanFilter(e_mea, e_est, q);
 }
 
 int refreshTime = millis();
@@ -36,21 +39,27 @@ int refreshTime = millis();
 void loop() {
   M5.update();
 
-  if (M5.BtnA.wasReleased()) {
+  if (M5.BtnA.isPressed()) {
     q -= 0.01;
     if (q < 0) q = 0.1;
     kf = SimpleKalmanFilter(e_mea, e_est, q);
+    EEPROM.writeFloat(0, q);
+    EEPROM.commit();
   }
 
-  if (M5.BtnB.wasReleased()) {
+  if (M5.BtnB.isPressed()) {
     q = 0.2;
     kf = SimpleKalmanFilter(e_mea, e_est, q);
+    EEPROM.writeFloat(0, q);
+    EEPROM.commit();
   }
 
-  if (M5.BtnC.wasReleased()) {
+  if (M5.BtnC.isPressed()) {
     q += 0.01;
     if (q >= 1) q = 1;
     kf = SimpleKalmanFilter(e_mea, e_est, q);
+    EEPROM.writeFloat(0, q);
+    EEPROM.commit();
   }
 
   float readingTemp = mlx.readObjectTempC();
