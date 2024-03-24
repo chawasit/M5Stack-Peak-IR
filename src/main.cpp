@@ -13,7 +13,7 @@ float e_est = 10;
 float q = 0.2;
 
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
-SimpleKalmanFilter kf;
+SimpleKalmanFilter kf = SimpleKalmanFilter(e_mea, e_est, q);
 
 int pointer = 0;
 float dataPoint[MAX_DATA_POINT] = {};
@@ -22,7 +22,7 @@ void setup() {
   M5.begin();                // Init M5Core.
   M5.Power.begin();          // Init Power module.
   M5.Lcd.fillScreen(WHITE);  // Set the screen background.
-  EEPROM.begin(1);
+  EEPROM.begin(4);
 
   delay(1000);
 
@@ -39,22 +39,22 @@ int refreshTime = millis();
 void loop() {
   M5.update();
 
-  if (M5.BtnA.isPressed()) {
+  if (M5.BtnA.wasPressed()) {
     q -= 0.01;
-    if (q < 0) q = 0.1;
+    if (q < 0) q = 0.01;
     kf = SimpleKalmanFilter(e_mea, e_est, q);
     EEPROM.writeFloat(0, q);
     EEPROM.commit();
   }
 
-  if (M5.BtnB.isPressed()) {
+  if (M5.BtnB.wasPressed()) {
     q = 0.2;
     kf = SimpleKalmanFilter(e_mea, e_est, q);
     EEPROM.writeFloat(0, q);
     EEPROM.commit();
   }
 
-  if (M5.BtnC.isPressed()) {
+  if (M5.BtnC.wasPressed()) {
     q += 0.01;
     if (q >= 1) q = 1;
     kf = SimpleKalmanFilter(e_mea, e_est, q);
@@ -108,7 +108,7 @@ void loop() {
     M5.Lcd.setTextColor(CYAN, BLACK);
     M5.Lcd.printf("%3.2f c", lowerBoundTemp);
 
-    M5.Lcd.setCursor(230, 205);
+    M5.Lcd.setCursor(230, 200);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BLACK);
     M5.Lcd.printf("T=%2.0f c", mlx.readAmbientTempC());
