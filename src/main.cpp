@@ -6,7 +6,7 @@
 
 #define READ_RATE 64
 #define MAX_DATA_POINT READ_RATE
-#define DISPLAY_REFRESH_RATE 30
+#define DISPLAY_REFRESH_RATE 24
 
 float e_mea = 10;
 float e_est = 10;
@@ -70,25 +70,25 @@ void loop() {
 
   pointer %= MAX_DATA_POINT;
 
-  float upperBoundTemp = 0;
-  for (int i = 0; i < MAX_DATA_POINT; i++) {
-    upperBoundTemp = max(upperBoundTemp, dataPoint[i]);
-  }
-
-  float lowerBoundTemp = 999;
-  for (int i = 0; i < MAX_DATA_POINT; i++) {
-    lowerBoundTemp = min(lowerBoundTemp, dataPoint[i]);
-  }
-
   if (millis() > refreshTime) {
+    float upperBoundTemp = 0;
+    for (int i = 0; i < MAX_DATA_POINT; i++) {
+      upperBoundTemp = max(upperBoundTemp, dataPoint[i]);
+    }
+
+    float lowerBoundTemp = 999;
+    for (int i = 0; i < MAX_DATA_POINT; i++) {
+      lowerBoundTemp = min(lowerBoundTemp, dataPoint[i]);
+    }
+
     M5.Lcd.setCursor(10, 10);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE);
     M5.Lcd.print("Upper Bound Temp.");
     M5.Lcd.setCursor(20, 34);
-    M5.Lcd.setTextSize(3);
+    M5.Lcd.setTextSize(4);
     M5.Lcd.setTextColor(RED, BLACK);
-    M5.Lcd.printf("%3.2f c", upperBoundTemp);
+    M5.Lcd.printf("%6.2fc", upperBoundTemp);
 
     M5.Lcd.setCursor(10, 78);
     M5.Lcd.setTextSize(2);
@@ -97,26 +97,26 @@ void loop() {
     M5.Lcd.setCursor(20, 108);
     M5.Lcd.setTextSize(6);
     M5.Lcd.setTextColor(ORANGE, BLACK);
-    M5.Lcd.printf("%3.2f c", estimated_value);
+    M5.Lcd.printf("%6.2fc", estimated_value);
 
     M5.Lcd.setCursor(10, 176);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE);
     M5.Lcd.print("Lower Bound Temp.");
     M5.Lcd.setCursor(20, 200);
-    M5.Lcd.setTextSize(3);
-    M5.Lcd.setTextColor(CYAN, BLACK);
-    M5.Lcd.printf("%3.2f c", lowerBoundTemp);
+    M5.Lcd.setTextSize(4);
+    M5.Lcd.setTextColor(YELLOW, BLACK);
+    M5.Lcd.printf("%6.2fc", lowerBoundTemp);
 
     M5.Lcd.setCursor(230, 200);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BLACK);
-    M5.Lcd.printf("T=%2.0f c", mlx.readAmbientTempC());
+    M5.Lcd.printf("T=%4.1fc", mlx.readAmbientTempC());
 
     M5.Lcd.setCursor(230, 220);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BLACK);
-    M5.Lcd.printf("Q=%1.2f ", q);
+    M5.Lcd.printf("Q=%4.2f ", q);
 
     refreshTime = millis() + (1000.0 / DISPLAY_REFRESH_RATE);
   }
